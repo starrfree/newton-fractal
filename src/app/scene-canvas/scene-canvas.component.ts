@@ -43,6 +43,8 @@ export class SceneCanvasComponent implements OnInit {
     const programInfo = {
       program: shaderProgram,
       uniformLocations: {
+        width: gl.getUniformLocation(shaderProgram, 'u_Width'),
+        height: gl.getUniformLocation(shaderProgram, 'u_Height')
       },
       attribLocations: {
         vertexPosition: gl.getAttribLocation(shaderProgram, 'i_VertexPosition')
@@ -85,6 +87,8 @@ export class SceneCanvasComponent implements OnInit {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
     gl.useProgram(programInfo.program)
+    gl.uniform1f(programInfo.uniformLocations.width, gl.canvas.width)
+    gl.uniform1f(programInfo.uniformLocations.height, gl.canvas.height)
     {
       const numComponents = 2
       const type = gl.FLOAT

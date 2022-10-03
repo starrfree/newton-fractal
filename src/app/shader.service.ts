@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,23 +9,15 @@ export class ShaderService {
   vertexSource = ""
   fragmentSource = ""
   gl!: WebGL2RenderingContext
-
   didInit = false
-  onInit: any[] = []
 
-  constructor(private http: HttpClient) { 
-    this.http.get("shaders/vertex.glsl", {responseType: 'text'})
-      .subscribe(res => {
-        this.vertexSource = res
-        this.http.get("shaders/fragment.glsl", {responseType: 'text'})
-          .subscribe(res => {
-            this.fragmentSource = res
-            this.didInit = true
-            this.onInit.forEach(element => {
-              element()
-            });
-          })
-      })
+  constructor(private http: HttpClient) {
+  }
+
+  public async getShaders() {
+    this.vertexSource = await firstValueFrom(this.http.get("shaders/vertex.glsl", {responseType: 'text'}))
+    this.fragmentSource = await firstValueFrom(this.http.get("shaders/fragment.glsl", {responseType: 'text'}))
+    this.didInit = true
   }
 
   public initShaderProgram(gl: any, vsSource: string, fsSource: string, transform_feedback_varyings: string[] | null = null): any {

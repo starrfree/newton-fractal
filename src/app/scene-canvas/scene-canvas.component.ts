@@ -11,22 +11,17 @@ export class SceneCanvasComponent implements OnInit {
   didInit: boolean = false
   buffers: any
 
-  constructor(private shaderService: ShaderService) { 
-    shaderService.onInit.push(() => {
-      if (this.didInit) {
-        this.main()
-      }
-    })
+  constructor(private shaderService: ShaderService) {
   }
 
   ngOnInit(): void {
   }
 
   ngAfterViewInit(): void {
-    if (this.shaderService.didInit && !this.didInit) {
+    this.shaderService.getShaders().then(() => {
+      this.didInit = true
       this.main()
-    }
-    this.didInit = true
+    })
   }
 
   main() {

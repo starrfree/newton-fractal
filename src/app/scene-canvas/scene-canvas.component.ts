@@ -10,8 +10,31 @@ export class SceneCanvasComponent implements OnInit {
   @ViewChild('glCanvas') public canvas!: ElementRef
   didInit: boolean = false
   buffers: any
+  points: number[] = []
+  colors: number[] = []
 
   constructor(private shaderService: ShaderService) {
+    this.points.push(1)
+    this.points.push(0)
+
+    this.points.push(-1/2)
+    this.points.push(Math.sqrt(3) / 2)
+
+    this.points.push(-1/2)
+    this.points.push(-Math.sqrt(3) / 2)
+
+
+    this.colors.push(0.9)
+    this.colors.push(0.1)
+    this.colors.push(0.1)
+
+    this.colors.push(0.2)
+    this.colors.push(0.9)
+    this.colors.push(0.1)
+
+    this.colors.push(0.3)
+    this.colors.push(0.3)
+    this.colors.push(1)
   }
 
   ngOnInit(): void {
@@ -39,15 +62,18 @@ export class SceneCanvasComponent implements OnInit {
       program: shaderProgram,
       uniformLocations: {
         width: gl.getUniformLocation(shaderProgram, 'u_Width'),
-        height: gl.getUniformLocation(shaderProgram, 'u_Height')
+        height: gl.getUniformLocation(shaderProgram, 'u_Height'),
+        pointCount: gl.getUniformLocation(shaderProgram, 'u_PointCount'),
+        points: gl.getUniformLocation(shaderProgram, 'u_Points'),
+        colors: gl.getUniformLocation(shaderProgram, 'u_Colors')
       },
       attribLocations: {
         vertexPosition: gl.getAttribLocation(shaderProgram, 'i_VertexPosition')
       }
     }
     const resizeCanvas = () => {
-      this.canvas.nativeElement.width = this.canvas.nativeElement.clientWidth
-      this.canvas.nativeElement.height = this.canvas.nativeElement.clientHeight
+      this.canvas.nativeElement.width = this.canvas.nativeElement.clientWidth * 2
+      this.canvas.nativeElement.height = this.canvas.nativeElement.clientHeight * 2
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
       this.drawScene(gl, programInfo)
     }
@@ -84,6 +110,9 @@ export class SceneCanvasComponent implements OnInit {
     gl.useProgram(programInfo.program)
     gl.uniform1f(programInfo.uniformLocations.width, gl.canvas.width)
     gl.uniform1f(programInfo.uniformLocations.height, gl.canvas.height)
+    gl.uniform1i(programInfo.uniformLocations.pointCount, this.points.length)
+    gl.uniform2fv(programInfo.uniformLocations.points, this.points)
+    gl.uniform3fv(programInfo.uniformLocations.colors, this.colors)
     {
       const numComponents = 2
       const type = gl.FLOAT

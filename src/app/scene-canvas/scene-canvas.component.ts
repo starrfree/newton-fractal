@@ -95,21 +95,38 @@ export class SceneCanvasComponent implements OnInit {
       // requestAnimationFrame(render)
     }
     render()
-    this.canvas.nativeElement.addEventListener('pointermove', (event: any) => {
+    this.canvas.nativeElement.addEventListener('mousemove', (event: any) => {
       this.onMouseMove(event)
       render()
-    })
-    this.canvas.nativeElement.addEventListener('pointerdown', (event: any) => {this.startDrag(event)})
-    this.canvas.nativeElement.addEventListener('pointerup', (event: any) => {this.stopDrag(event)})
-    this.canvas.nativeElement.addEventListener('pointercancel', (event: any) => {this.stopDrag(event)})
-    this.canvas.nativeElement.addEventListener('pointerout', (event: any) => {this.stopDrag(event)})
-    this.canvas.nativeElement.addEventListener('pointerleave', (event: any) => {this.stopDrag(event)})
+    }, { passive: false })
+    this.canvas.nativeElement.addEventListener('mousedown', (event: any) => {this.startDrag(event)})
+    this.canvas.nativeElement.addEventListener('mouseup', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('mousecancel', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('mouseout', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('mouseleave', (event: any) => {this.stopDrag(event)})
+
+    this.canvas.nativeElement.addEventListener('touchmove', (event: any) => {
+      this.onMouseMove(event)
+      render()
+    }, { passive: false })
+    this.canvas.nativeElement.addEventListener('touchstart', (event: any) => {this.startDrag(event)})
+    this.canvas.nativeElement.addEventListener('touchend', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('touchcancel', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('touchout', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('touchleave', (event: any) => {this.stopDrag(event)})
   }
 
   positionToComplex(position: {x: number, y: number}): {x: number, y: number} {
     return {
       x: position.x / this.canvas.nativeElement.width * 6 - 1.5,
       y: (1 - position.y / this.canvas.nativeElement.height) * 6 - 4.5
+    }
+  }
+
+  complexToPosition(complex: {x: number, y: number}): {x: number, y: number} {
+    return {
+      x: (complex.x + 1.5) * this.canvas.nativeElement.width / 6,
+      y: (1 - (complex.y + 4.5) / 6) * this.canvas.nativeElement.height
     }
   }
 

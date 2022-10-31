@@ -27,15 +27,24 @@ void main() {
     }
   }
   vec3 color = vec3(0.0, 0.0, 0.0);
+  float iterations[3] = float[3](0.0, 0.0, 0.0);
   for(int i = 0; i < 50; i++) {
     for(int j = 0; j < u_PointCount; j++) {
-      if (z == u_Points[j]) {
-        color = u_Colors[j];
-        break;
+      iterations[j] += 0.3 * pow(module(z - u_Points[j]) * 0.1, 0.05) ;
+      if (z == u_Points[j]) { //distance(z, u_Points[j]) < 0.01//
+        color = u_Colors[j] / iterations[j] + 0.1; // iterations[j]
+        o_FragColor = vec4(color, 1.0);
+        return;
       }
     }
-    vec2 z2 = complexMult(z, z);
-    z = complexAdd(z, -1.0 * complexDiv(complexMult(z2, z) + vec2(-1.0, 0.0), 3.0 * z2));
+    vec2 zsq = complexMult(z, z);
+    vec2 zcu = complexMult(zsq, z);
+    vec2 z1 = u_Points[0];
+    vec2 z2 = u_Points[1];
+    vec2 z3 = u_Points[2];
+    vec2 pp = 3.0 * zsq - 2.0 * complexMult(z, (z1 + z2 + z3)) + complexMult(z1, z2) + complexMult(z1, z3) + complexMult(z3, z2);
+    vec2 p = complexMult(z - z1, complexMult(z - z2, z - z3));
+    z = z - complexDiv(p, pp);
   }
   o_FragColor = vec4(color, 1.0);
 }

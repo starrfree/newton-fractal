@@ -24,17 +24,17 @@ export class SceneCanvasComponent implements OnInit {
     this.points.push(-Math.sqrt(3) / 2)
 
 
-    this.colors.push(0.9)
-    this.colors.push(0.1)
-    this.colors.push(0.1)
-
-    this.colors.push(0.2)
-    this.colors.push(0.9)
-    this.colors.push(0.1)
-
-    this.colors.push(0.3)
-    this.colors.push(0.3)
     this.colors.push(1)
+    this.colors.push(0)
+    this.colors.push(0)
+
+    this.colors.push(0)
+    this.colors.push(1)
+    this.colors.push(0)
+
+    this.colors.push(0)
+    this.colors.push(0)
+    this.colors.push(3)
   }
 
   ngOnInit(): void {
@@ -72,6 +72,13 @@ export class SceneCanvasComponent implements OnInit {
       }
     }
     const resizeCanvas = () => {
+      // if (this.canvas.nativeElement.clientWidth < this.canvas.nativeElement.clientHeight) {
+      //   this.canvas.nativeElement.width = this.canvas.nativeElement.clientWidth * 2
+      //   this.canvas.nativeElement.height = this.canvas.nativeElement.clientWidth * 2
+      // } else {
+      //   this.canvas.nativeElement.width = this.canvas.nativeElement.clientHeight * 2
+      //   this.canvas.nativeElement.height = this.canvas.nativeElement.clientHeight * 2
+      // }
       this.canvas.nativeElement.width = this.canvas.nativeElement.clientWidth * 2
       this.canvas.nativeElement.height = this.canvas.nativeElement.clientHeight * 2
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
@@ -80,9 +87,35 @@ export class SceneCanvasComponent implements OnInit {
     resizeCanvas()
     var render = () => {
       this.drawScene(gl, programInfo)
-      // requestAnimationFrame(render)
+      // for (let i = 0; i < this.points.length; i++) {
+      //   this.points[i] += (Math.random() * 2 - 1) * 0.001
+      // }
+      requestAnimationFrame(render)
     }
     render()
+    this.canvas.nativeElement.addEventListener('pointermove', (event: any) => {
+      this.onMouseMove(event)
+      render()
+    })
+  }
+
+  onMouseMove(event: any) {
+    var position = {x: 0, y: 0}
+    if (event.touches) {
+      if (event.touches.length > 0) {
+        position = {
+          x: event.touches[0].clientX,
+          y: event.touches[0].clientY
+        }
+      }
+    } else {
+      position = {
+        x: event.x,
+        y: event.y
+      }
+    }
+    this.points[0] = position.x / this.canvas.nativeElement.width * 6 - 1.5
+    this.points[1] = (1 - position.y / this.canvas.nativeElement.height) * 6 - 4.5
   }
 
   initBuffers(gl: WebGL2RenderingContext) {

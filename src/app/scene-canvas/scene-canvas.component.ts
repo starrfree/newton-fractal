@@ -14,50 +14,19 @@ export class SceneCanvasComponent implements OnInit {
   colors: number[] = []
   isDragging: boolean = false
   draggedIndex?: number
+  pointCount: number = 3
 
   constructor(private shaderService: ShaderService) {
-    this.points.push(1)
-    this.points.push(0)
+    var n = this.pointCount
+    for (let i = 0; i < n; i++) {
+      this.points.push(Math.cos(2 * Math.PI * i / n))
+      this.points.push(Math.sin(2 * Math.PI * i / n))
 
-    this.points.push(-1/2)
-    this.points.push(Math.sqrt(3) / 2)
-
-    this.points.push(-1/2)
-    this.points.push(-Math.sqrt(3) / 2)
-
-    this.points.push(0.2)
-    this.points.push(-0.8)
-
-    this.points.push(0.5)
-    this.points.push(0.5)
-
-    this.points.push(-0.9)
-    this.points.push(-0.5)
-
-
-    this.colors.push(1)
-    this.colors.push(0)
-    this.colors.push(0)
-
-    this.colors.push(0)
-    this.colors.push(1)
-    this.colors.push(0)
-
-    this.colors.push(0)
-    this.colors.push(0)
-    this.colors.push(1)
-
-    this.colors.push(1)
-    this.colors.push(1)
-    this.colors.push(0)
-
-    this.colors.push(1)
-    this.colors.push(0)
-    this.colors.push(1)
-
-    this.colors.push(0)
-    this.colors.push(1)
-    this.colors.push(1)
+      var color = this.HSVtoRGB(i / n, 0.9, 1)
+      this.colors.push(color.r)
+      this.colors.push(color.g)
+      this.colors.push(color.b)
+    }
   }
 
   ngOnInit(): void {
@@ -108,6 +77,9 @@ export class SceneCanvasComponent implements OnInit {
       this.drawScene(gl, programInfo)
     }
     resizeCanvas()
+    window.addEventListener('resize', () => {
+      resizeCanvas()
+    })
     var render = () => {
       this.drawScene(gl, programInfo)
       // for (let i = 0; i < this.points.length; i++) {
@@ -138,17 +110,13 @@ export class SceneCanvasComponent implements OnInit {
   }
 
   positionToComplex(position: {x: number, y: number}): {x: number, y: number} {
-    return {
-      x: position.x / this.canvas.nativeElement.width * 6 - 1.5,
-      y: (1 - position.y / this.canvas.nativeElement.height) * 6 - 4.5
-    }
-  }
-
-  complexToPosition(complex: {x: number, y: number}): {x: number, y: number} {
-    return {
-      x: (complex.x + 1.5) * this.canvas.nativeElement.width / 6,
-      y: (1 - (complex.y + 4.5) / 6) * this.canvas.nativeElement.height
-    }
+    position.y = this.canvas.nativeElement.clientHeight - position.y
+    var size = Math.min(this.canvas.nativeElement.clientWidth, this.canvas.nativeElement.clientHeight)
+    var complexWidth = 3
+    var complexeHeight = 3
+    var z = {x: complexWidth * position.x / size - complexWidth / (2 / (this.canvas.nativeElement.clientWidth / size)),
+             y: complexeHeight * position.y / size - complexeHeight / (2 / (this.canvas.nativeElement.clientHeight / size))}
+    return z
   }
 
   onMouseMove(event: any) {
@@ -176,7 +144,7 @@ export class SceneCanvasComponent implements OnInit {
         for (let i = 0; i < this.points.length / 2; i++) {
           var dx = this.points[i * 2] - complex.x
           var dy = this.points[i * 2 + 1] - complex.y
-          if (dx*dx + dy*dy < 0.002) {
+          if (dx*dx < 0.002) { //  + dy*dy
             this.draggedIndex = 2 * i
             this.points[i * 2] = complex.x
             this.points[i * 2 + 1] = complex.y
@@ -244,4 +212,29 @@ export class SceneCanvasComponent implements OnInit {
     }
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
   }
+
+  HSVtoRGB(h: number, s: number, v: number): any {
+    var r, g, b, i, f, p, q, t: number;
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    if (r == undefined || g == undefined || b == undefined) {
+      return
+    }
+    return {
+        r: r,
+        g: g,
+        b: b
+    };
+}
 }

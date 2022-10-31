@@ -19,21 +19,25 @@ vec2 complexDiv(vec2 z1, vec2 z2);
 float module(vec2 z);
 
 void main() {
-  vec2 z = vec2(3.0 * gl_FragCoord.x / u_Width - 1.5, 3.0 * gl_FragCoord.y / u_Height - 1.5);
+  float size = min(u_Width, u_Height);
+  float complexWidth = 3.0;
+  float complexeHeight = 3.0;
+  vec2 z = vec2(complexWidth * gl_FragCoord.x / size - complexWidth / (2.0 / (u_Width / size)), complexeHeight * gl_FragCoord.y / size - complexeHeight / (2.0 / (u_Height / size)));
+  
   for(int i = 0; i < u_PointCount; i++) {
     float d = distance(z, u_Points[i]);
-    if (d < 0.015 && d > 0.01) {
+    if (d < 0.02 / size * 1500.0 && d > 0.012 / size * 1500.0) {
       o_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
       return;
     }
   }
   vec3 color = vec3(0.0, 0.0, 0.0);
   float iterations[MAX_POINTS];
-  for(int i = 0; i < 50; i++) {
+  for(int i = 0; i < 100; i++) {
     for(int j = 0; j < u_PointCount; j++) {
-      iterations[j] += 0.3 * pow(module(z - u_Points[j]) * 0.1, 0.1);
+      iterations[j] += 0.5 * pow(module(z - u_Points[j]) * 0.1, 0.1);//0.2;//
       if (z == u_Points[j]) { //distance(z, u_Points[j]) < 0.001
-        color = u_Colors[j] / iterations[j] + 0.1; // iterations[j]
+        color = u_Colors[j] / max(iterations[j], 1.0) + 0.1; // iterations[j]
         o_FragColor = vec4(color, 1.0);
         return;
       }

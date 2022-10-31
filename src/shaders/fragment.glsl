@@ -1,11 +1,12 @@
 # version 300 es
 precision highp float;
+#define MAX_POINTS 20
 
 uniform float u_Width;
 uniform float u_Height;
 uniform int u_PointCount;
-uniform vec2 u_Points[3];
-uniform vec3 u_Colors[3];
+uniform vec2 u_Points[MAX_POINTS];
+uniform vec3 u_Colors[MAX_POINTS];
 
 out vec4 o_FragColor;
 
@@ -27,23 +28,28 @@ void main() {
     }
   }
   vec3 color = vec3(0.0, 0.0, 0.0);
-  float iterations[3] = float[3](0.0, 0.0, 0.0);
+  float iterations[MAX_POINTS];
   for(int i = 0; i < 50; i++) {
     for(int j = 0; j < u_PointCount; j++) {
-      iterations[j] += 0.3 * pow(module(z - u_Points[j]) * 0.1, 0.05) ;
-      if (z == u_Points[j]) { //distance(z, u_Points[j]) < 0.01//
+      iterations[j] += 0.3 * pow(module(z - u_Points[j]) * 0.1, 0.1);
+      if (z == u_Points[j]) { //distance(z, u_Points[j]) < 0.001
         color = u_Colors[j] / iterations[j] + 0.1; // iterations[j]
         o_FragColor = vec4(color, 1.0);
         return;
       }
     }
-    vec2 zsq = complexMult(z, z);
-    vec2 zcu = complexMult(zsq, z);
-    vec2 z1 = u_Points[0];
-    vec2 z2 = u_Points[1];
-    vec2 z3 = u_Points[2];
-    vec2 pp = 3.0 * zsq - 2.0 * complexMult(z, (z1 + z2 + z3)) + complexMult(z1, z2) + complexMult(z1, z3) + complexMult(z3, z2);
-    vec2 p = complexMult(z - z1, complexMult(z - z2, z - z3));
+    vec2 p = vec2(1.0, 0.0);
+    vec2 pp = vec2(0.0);
+    for(int j = 0; j < u_PointCount; j++) {
+      vec2 prod = vec2(1.0, 0.0);
+      for(int k = 0; k < u_PointCount; k++) {
+        if (j != k) {
+          prod = complexMult(prod, z - u_Points[k]);
+        }
+      }
+      pp += prod;
+      p = complexMult(p, z - u_Points[j]);
+    }
     z = z - complexDiv(p, pp);
   }
   o_FragColor = vec4(color, 1.0);

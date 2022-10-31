@@ -25,6 +25,15 @@ export class SceneCanvasComponent implements OnInit {
     this.points.push(-1/2)
     this.points.push(-Math.sqrt(3) / 2)
 
+    this.points.push(0.2)
+    this.points.push(-0.8)
+
+    this.points.push(0.5)
+    this.points.push(0.5)
+
+    this.points.push(-0.9)
+    this.points.push(-0.5)
+
 
     this.colors.push(1)
     this.colors.push(0)
@@ -36,7 +45,19 @@ export class SceneCanvasComponent implements OnInit {
 
     this.colors.push(0)
     this.colors.push(0)
-    this.colors.push(3)
+    this.colors.push(1)
+
+    this.colors.push(1)
+    this.colors.push(1)
+    this.colors.push(0)
+
+    this.colors.push(1)
+    this.colors.push(0)
+    this.colors.push(1)
+
+    this.colors.push(0)
+    this.colors.push(1)
+    this.colors.push(1)
   }
 
   ngOnInit(): void {
@@ -202,7 +223,7 @@ export class SceneCanvasComponent implements OnInit {
     gl.useProgram(programInfo.program)
     gl.uniform1f(programInfo.uniformLocations.width, gl.canvas.width)
     gl.uniform1f(programInfo.uniformLocations.height, gl.canvas.height)
-    gl.uniform1i(programInfo.uniformLocations.pointCount, this.points.length)
+    gl.uniform1i(programInfo.uniformLocations.pointCount, this.points.length / 2)
     gl.uniform2fv(programInfo.uniformLocations.points, this.points)
     gl.uniform3fv(programInfo.uniformLocations.colors, this.colors)
     {

@@ -12,6 +12,8 @@ export class SceneCanvasComponent implements OnInit {
   buffers: any
   points: number[] = []
   colors: number[] = []
+  isDragging: boolean = false
+  draggedIndex?: number
 
   constructor(private shaderService: ShaderService) {
     this.points.push(1)
@@ -90,32 +92,72 @@ export class SceneCanvasComponent implements OnInit {
       // for (let i = 0; i < this.points.length; i++) {
       //   this.points[i] += (Math.random() * 2 - 1) * 0.001
       // }
-      requestAnimationFrame(render)
+      // requestAnimationFrame(render)
     }
     render()
     this.canvas.nativeElement.addEventListener('pointermove', (event: any) => {
       this.onMouseMove(event)
       render()
     })
+    this.canvas.nativeElement.addEventListener('pointerdown', (event: any) => {this.startDrag(event)})
+    this.canvas.nativeElement.addEventListener('pointerup', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('pointercancel', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('pointerout', (event: any) => {this.stopDrag(event)})
+    this.canvas.nativeElement.addEventListener('pointerleave', (event: any) => {this.stopDrag(event)})
+  }
+
+  positionToComplex(position: {x: number, y: number}): {x: number, y: number} {
+    return {
+      x: position.x / this.canvas.nativeElement.width * 6 - 1.5,
+      y: (1 - position.y / this.canvas.nativeElement.height) * 6 - 4.5
+    }
   }
 
   onMouseMove(event: any) {
-    var position = {x: 0, y: 0}
-    if (event.touches) {
-      if (event.touches.length > 0) {
+    event.preventDefault()
+    if (this.isDragging) {
+      var position = {x: 0, y: 0}
+      if (event.touches) {
+        if (event.touches.length > 0) {
+          position = {
+            x: event.touches[0].clientX,
+            y: event.touches[0].clientY
+          }
+        }
+      } else {
         position = {
-          x: event.touches[0].clientX,
-          y: event.touches[0].clientY
+          x: event.x,
+          y: event.y
         }
       }
-    } else {
-      position = {
-        x: event.x,
-        y: event.y
+      var complex = this.positionToComplex(position)
+      if (this.draggedIndex != undefined) {
+        this.points[this.draggedIndex] = complex.x
+        this.points[this.draggedIndex + 1] = complex.y
+      } else {
+        for (let i = 0; i < this.points.length / 2; i++) {
+          var dx = this.points[i * 2] - complex.x
+          var dy = this.points[i * 2 + 1] - complex.y
+          if (dx*dx + dy*dy < 0.002) {
+            this.draggedIndex = 2 * i
+            this.points[i * 2] = complex.x
+            this.points[i * 2 + 1] = complex.y
+            break
+          }
+        }
       }
     }
-    this.points[0] = position.x / this.canvas.nativeElement.width * 6 - 1.5
-    this.points[1] = (1 - position.y / this.canvas.nativeElement.height) * 6 - 4.5
+  }
+
+  startDrag(event: any) {
+    this.isDragging = true
+  }
+
+  stopDrag(event: any) {
+    if (this.isDragging) {
+      this.isDragging = false
+      this.draggedIndex = undefined
+    }
   }
 
   initBuffers(gl: WebGL2RenderingContext) {

@@ -6,5 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'webgl-template';
+  showToolbar = false;
+
+  toggleToolbar() {
+    this.showToolbar = !this.showToolbar
+  }
 }

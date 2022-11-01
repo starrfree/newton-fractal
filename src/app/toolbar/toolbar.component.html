@@ -1,0 +1,41 @@
+<div class="outer">
+  <div class="container glass">
+    <div class="escape-button" (click)="escape.emit()">
+      <img src="assets/svg/xmark.circle.svg" alt="escape">
+    </div>
+    <h1 class="title">Newton fractal</h1>
+    <!-- <p (click)="addPoint()">More points</p> -->
+    <p class="section">
+      <span class="remove-point-button point-button" [style.opacity]="parametersService.pointCount == 1 ? 0.5 : 0.9" [style.cursor]="parametersService.pointCount == 1 ? 'default' : 'pointer'">
+        <img src="assets/svg/minus.circle.svg" alt="remove root" (click)="removePoint()">
+      </span>
+      <span class="medium-title">{{points.length}} roots</span>
+      <span class="add-point-button point-button" [style.opacity]="parametersService.pointCount == 7 ? 0.5 : 0.9" [style.cursor]="parametersService.pointCount == 7 ? 'default' : 'pointer'">
+        <img src="assets/svg/plus.circle.svg" alt="add root" (click)="addPoint()">
+      </span>
+      <li *ngFor="let point of points; let index = index" style="--point-color: {{getColor(index)}};">
+        {{point.x | number : '1.0-2'}} + {{point.y | number : '1.0-2'}} <span class="imaginary">i</span>
+      </li>
+    </p>
+    <div class="section">
+      <span class="medium-title">Coloring</span>
+      <div class="radio-button-container">
+        <span class="radio-button" (click)="setColoring('uniform')">
+          <img *ngIf="parametersService.coloring != 'uniform'" class="radio-mark" src="assets/svg/circle.svg" alt="not selected">
+          <img *ngIf="parametersService.coloring == 'uniform'" class="radio-mark" src="assets/svg/circle.circle.svg" alt="not selected">
+          <span>Uniform</span>
+        </span>
+        <span class="radio-button" (click)="setColoring('smooth')">
+          <img *ngIf="parametersService.coloring != 'smooth'" class="radio-mark" src="assets/svg/circle.svg" alt="not selected">
+          <img *ngIf="parametersService.coloring == 'smooth'" class="radio-mark" src="assets/svg/circle.circle.svg" alt="not selected">
+          <span>Smooth</span>
+        </span>
+        <span class="radio-button" (click)="setColoring('discrete')">
+          <img *ngIf="parametersService.coloring != 'discrete'" class="radio-mark" src="assets/svg/circle.svg" alt="not selected">
+          <img *ngIf="parametersService.coloring == 'discrete'" class="radio-mark" src="assets/svg/circle.circle.svg" alt="not selected">
+          <span>Discrete</span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

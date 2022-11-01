@@ -7,6 +7,7 @@ uniform float u_Height;
 uniform int u_PointCount;
 uniform vec2 u_Points[MAX_POINTS];
 uniform vec3 u_Colors[MAX_POINTS];
+uniform int u_Coloring;
 
 out vec4 o_FragColor;
 
@@ -33,11 +34,19 @@ void main() {
   }
   vec3 color = vec3(0.0, 0.0, 0.0);
   float iterations[MAX_POINTS];
-  for(int i = 0; i < 100; i++) {
+  for(int i = 0; i < 30; i++) {
     for(int j = 0; j < u_PointCount; j++) {
-      iterations[j] += 0.5 * pow(module(z - u_Points[j]) * 0.1, 0.1);//0.2;//
+      if (u_Coloring == 1) {
+        iterations[j] += 0.5 * pow(module(z - u_Points[j]) * 0.1, 0.1);
+      } else if (u_Coloring == 2) {
+        iterations[j] += 0.2;
+      }
       if (z == u_Points[j]) { //distance(z, u_Points[j]) < 0.001
-        color = u_Colors[j] / max(iterations[j], 1.0) + 0.1; // iterations[j]
+        if (u_Coloring == 1 || u_Coloring == 2) {
+          color = u_Colors[j] / max(iterations[j], 1.0) + 0.1; // iterations[j]
+        } else {
+          color = u_Colors[j];
+        }
         o_FragColor = vec4(color, 1.0);
         return;
       }

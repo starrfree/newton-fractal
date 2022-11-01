@@ -1,1 +1,5 @@
 <app-scene-canvas></app-scene-canvas>
+<app-toolbar *ngIf="showToolbar" class="toolbar" (escape)="toggleToolbar()"></app-toolbar>
+<div *ngIf="!showToolbar" class="toolbar-button-container glass" (click)="toggleToolbar()">
+  <img src="assets/svg/gearshape.fill.svg" alt="toolbar">
+</div>

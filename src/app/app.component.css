@@ -1,0 +1,31 @@
+/* .toolbar {
+  transition: opacity 400ms;
+} */
+
+.toolbar-button-container {
+  z-index: 3;
+  width: 25px;
+  height: 25px;
+  opacity: 0.8;
+  position: fixed;
+  left: 10px;
+  top: 10px;
+  display: flex;
+  justify-content: center;
+  padding: 7px;
+  cursor: pointer;
+  transition: transform 200ms;
+}
+
+.toolbar-button-container:hover {
+  transform: scale(1.1);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}

@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ParametersService } from '../parameters.service';
 import { ShaderService } from '../shader.service';
 
 @Component({
@@ -14,18 +15,24 @@ export class SceneCanvasComponent implements OnInit {
   colors: number[] = []
   isDragging: boolean = false
   draggedIndex?: number
-  pointCount: number = 3
 
-  constructor(private shaderService: ShaderService) {
-    var n = this.pointCount
-    for (let i = 0; i < n; i++) {
-      this.points.push(Math.cos(2 * Math.PI * i / n))
-      this.points.push(Math.sin(2 * Math.PI * i / n))
-
-      var color = this.HSVtoRGB(i / n, 0.9, 1)
-      this.colors.push(color.r)
-      this.colors.push(color.g)
-      this.colors.push(color.b)
+  constructor(private shaderService: ShaderService, private parametersService: ParametersService) {
+    this.parametersService.refresh = () => {
+      this.points = []
+      this.colors = []
+      var n = this.parametersService.pointCount
+      for (let i = 0; i < n; i++) {
+        this.points.push(Math.cos(2 * Math.PI * i / n))
+        this.points.push(Math.sin(2 * Math.PI * i / n))
+        
+        var color = this.HSVtoRGB(i / n, 0.9, 1)
+        this.colors.push(color.r)
+        this.colors.push(color.g)
+        this.colors.push(color.b)
+      }
+      this.main()
+      this.parametersService.points = this.points
+      this.parametersService.colors = this.colors
     }
   }
 
@@ -35,7 +42,7 @@ export class SceneCanvasComponent implements OnInit {
   ngAfterViewInit(): void {
     this.shaderService.getShaders().then(() => {
       this.didInit = true
-      this.main()
+      this.parametersService.refresh!()
     })
   }
 
@@ -57,7 +64,8 @@ export class SceneCanvasComponent implements OnInit {
         height: gl.getUniformLocation(shaderProgram, 'u_Height'),
         pointCount: gl.getUniformLocation(shaderProgram, 'u_PointCount'),
         points: gl.getUniformLocation(shaderProgram, 'u_Points'),
-        colors: gl.getUniformLocation(shaderProgram, 'u_Colors')
+        colors: gl.getUniformLocation(shaderProgram, 'u_Colors'),
+        coloring: gl.getUniformLocation(shaderProgram, 'u_Coloring')
       },
       attribLocations: {
         vertexPosition: gl.getAttribLocation(shaderProgram, 'i_VertexPosition')
@@ -88,6 +96,7 @@ export class SceneCanvasComponent implements OnInit {
       // requestAnimationFrame(render)
     }
     render()
+    this.parametersService.draw = render
     this.canvas.nativeElement.addEventListener('mousemove', (event: any) => {
       this.onMouseMove(event)
       render()
@@ -144,7 +153,7 @@ export class SceneCanvasComponent implements OnInit {
         for (let i = 0; i < this.points.length / 2; i++) {
           var dx = this.points[i * 2] - complex.x
           var dy = this.points[i * 2 + 1] - complex.y
-          if (dx*dx < 0.002) { //  + dy*dy
+          if (dx*dx + dy*dy < 0.002) {
             this.draggedIndex = 2 * i
             this.points[i * 2] = complex.x
             this.points[i * 2 + 1] = complex.y
@@ -152,6 +161,8 @@ export class SceneCanvasComponent implements OnInit {
           }
         }
       }
+      this.parametersService.points = this.points
+      this.parametersService.colors = this.colors
     }
   }
 
@@ -194,6 +205,7 @@ export class SceneCanvasComponent implements OnInit {
     gl.uniform1i(programInfo.uniformLocations.pointCount, this.points.length / 2)
     gl.uniform2fv(programInfo.uniformLocations.points, this.points)
     gl.uniform3fv(programInfo.uniformLocations.colors, this.colors)
+    gl.uniform1i(programInfo.uniformLocations.coloring, this.parametersService.coloring == 'uniform' ? 0 : (this.parametersService.coloring == 'smooth' ? 1 : 2))
     {
       const numComponents = 2
       const type = gl.FLOAT
@@ -236,5 +248,5 @@ export class SceneCanvasComponent implements OnInit {
         g: g,
         b: b
     };
-}
+  }
 }

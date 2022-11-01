@@ -7,4 +7,5 @@
   /* aspect-ratio: 1; */
   background-color: black;
   image-rendering: pixelated;
+  z-index: -1;
 }

@@ -37,6 +37,7 @@ export class SceneCanvasComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.parametersService.getURL()
   }
 
   ngAfterViewInit(): void {
@@ -153,7 +154,7 @@ export class SceneCanvasComponent implements OnInit {
         for (let i = 0; i < this.points.length / 2; i++) {
           var dx = this.points[i * 2] - complex.x
           var dy = this.points[i * 2 + 1] - complex.y
-          if (dx*dx + dy*dy < 0.002) {
+          if (dx*dx + dy*dy < 0.004) {
             this.draggedIndex = 2 * i
             this.points[i * 2] = complex.x
             this.points[i * 2 + 1] = complex.y

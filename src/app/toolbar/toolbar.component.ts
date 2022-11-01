@@ -35,6 +35,7 @@ export class ToolbarComponent implements OnInit {
       if (this.parametersService.refresh) {
         this.parametersService.refresh()
       }
+      this.parametersService.setURL()
     }
   }
 
@@ -44,6 +45,7 @@ export class ToolbarComponent implements OnInit {
       if (this.parametersService.refresh) {
         this.parametersService.refresh()
       }
+      this.parametersService.setURL()
     }
   }
 
@@ -56,5 +58,6 @@ export class ToolbarComponent implements OnInit {
     if (this.parametersService.draw) {
       this.parametersService.draw()
     }
+    this.parametersService.setURL()
   }
 }

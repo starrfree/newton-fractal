@@ -44,6 +44,11 @@
   width: 25px;
   height: 25px;
   opacity: 0.9;
+  transition: transform 200ms;
+}
+
+.escape-button:hover {
+  transform: scale(1.1);
 }
 
 .divider {
@@ -70,12 +75,12 @@
 }
 
 .point-button {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
   display: inline-flex;
   justify-content: center;
   user-select: none;
-  transform: translateY(3px);
+  transform: translateY(2px);
 }
 
 .add-point-button {

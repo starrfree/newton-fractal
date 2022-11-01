@@ -1,2 +1,2 @@
-# Angular + WebGL template 
-This is a quick start WebGL project template for Angular.
+# Newton Fractal
+This is the source code of [this website](https://newtonfractal.starfree.app).
